@@ -1,0 +1,84 @@
+name: nyc-transit-predictor
+
+# ────────────────────────────────────────────────────────────────────
+# Two services share a single image:
+#   * pipeline   — one-shot training run
+#   * dashboard  — long-running Streamlit UI
+#
+# Typical workflow:
+#   docker compose build
+#   docker compose run --rm pipeline      # trains the model
+#   docker compose up -d dashboard        # serves the UI on :8501
+#
+# Optional:
+#   docker compose --profile dev up notebook   # Jupyter on :8888
+# ────────────────────────────────────────────────────────────────────
+
+x-common-environment: &common-env
+  SPARK_APP_NAME: NYCTransitPredictor
+  SPARK_MASTER: local[*]
+  SPARK_DRIVER_MEMORY: ${SPARK_DRIVER_MEMORY:-4g}
+  SPARK_EXECUTOR_MEMORY: ${SPARK_EXECUTOR_MEMORY:-4g}
+  SPARK_SHUFFLE_PARTITIONS: ${SPARK_SHUFFLE_PARTITIONS:-8}
+  RF_NUM_TREES: ${RF_NUM_TREES:-100}
+  RF_MAX_DEPTH: ${RF_MAX_DEPTH:-10}
+  LOG_LEVEL: ${LOG_LEVEL:-INFO}
+  PYTHONUNBUFFERED: "1"
+
+x-common-volumes: &common-volumes
+  - ./data:/app/data
+  - ./models:/app/models
+  - ./logs:/app/logs
+  - ./dashboard/static/plots:/app/dashboard/static/plots
+
+services:
+
+  # ── 1.  Training pipeline (one-shot) ──────────────────────────────
+  pipeline:
+    build: .
+    image: nyc-transit-predictor:latest
+    container_name: nyc-transit-pipeline
+    command: ["python", "-m", "dashboard.pipeline"]
+    environment: *common-env
+    volumes: *common-volumes
+    restart: "no"
+
+  # ── 2.  Streamlit dashboard (long-running) ────────────────────────
+  dashboard:
+    build: .
+    image: nyc-transit-predictor:latest
+    container_name: nyc-transit-dashboard
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    environment: *common-env
+    volumes: *common-volumes
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8501/_stcore/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # ── 3.  Jupyter notebook (dev profile only) ───────────────────────
+  notebook:
+    build: .
+    image: nyc-transit-predictor:latest
+    container_name: nyc-transit-notebook
+    profiles: ["dev"]
+    command: ["jupyter", "notebook",
+              "--ip=0.0.0.0",
+              "--port=8888",
+              "--no-browser",
+              "--allow-root",
+              "--NotebookApp.token=",
+              "--NotebookApp.password="]
+    ports:
+      - "8888:8888"
+    environment: *common-env
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./notebooks:/app/notebooks
+      - ./dashboard:/app/dashboard
+    working_dir: /app

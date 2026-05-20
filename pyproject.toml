@@ -1,0 +1,89 @@
+[project]
+name = "nyc-transit-predictor"
+version = "1.0.0"
+description = "End-to-end Big Data + ML pipeline predicting scheduled travel time between subway stops."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "NYC Transit Predictor maintainers" }]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["dashboard*"]
+exclude = ["tests*", "venv*", ".venv*", "notebooks*"]
+
+# ────────────────────────────────────────────────────────────────────
+# Ruff — fast linter + formatter (replaces flake8, isort, black)
+# ────────────────────────────────────────────────────────────────────
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = [".venv", "venv", "data", "models", "logs", "notebooks"]
+
+[tool.ruff.lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "B",    # flake8-bugbear
+    "C4",   # flake8-comprehensions
+    "UP",   # pyupgrade
+    "SIM",  # flake8-simplify
+    "RUF",  # ruff-specific
+]
+ignore = [
+    "E501",   # line-too-long (we use ruff format)
+    "B008",   # function call in default arg (used by dataclass field factories)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["E501"]
+"dashboard/views/*" = ["E402"]    # streamlit page setup ordering
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+# ────────────────────────────────────────────────────────────────────
+# Mypy — static type checking
+# ────────────────────────────────────────────────────────────────────
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+ignore_missing_imports = true
+follow_imports = "silent"
+no_implicit_optional = true
+check_untyped_defs = true
+exclude = ["venv/", ".venv/", "data/", "models/", "logs/", "notebooks/"]
+
+[[tool.mypy.overrides]]
+module = ["pyspark.*", "pydeck.*", "streamlit.*", "loguru.*"]
+ignore_missing_imports = true
+
+# ────────────────────────────────────────────────────────────────────
+# Pytest
+# ────────────────────────────────────────────────────────────────────
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+    "--showlocals",
+]
+markers = [
+    "slow: marks tests as slow (deselect with -m 'not slow')",
+    "spark: marks tests requiring an active SparkSession",
+    "integration: end-to-end tests against the full pipeline",
+]
+filterwarnings = [
+    "ignore::DeprecationWarning:pyspark.*",
+    "ignore::DeprecationWarning:pkg_resources.*",
+]

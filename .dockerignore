@@ -1,0 +1,48 @@
+# ── Virtual envs (huge) ─────────────────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Python caches ───────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# ── Jupyter checkpoints ─────────────────────────────────────────────
+.ipynb_checkpoints/
+
+# ── Git / IDE ───────────────────────────────────────────────────────
+.git/
+.gitignore
+.vscode/
+.idea/
+
+# ── OS / temp ───────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log
+
+# ── Secrets ─────────────────────────────────────────────────────────
+.env
+.env.local
+
+# ── Models / artefacts (mounted as volumes at runtime) ──────────────
+models/rf_pipeline/
+logs/
+dashboard/static/plots/
+
+# ── Spark scratch ───────────────────────────────────────────────────
+metastore_db/
+spark-warehouse/
+derby.log
+*.crc
+
+# ── Docs / misc ─────────────────────────────────────────────────────
+README.md
+*.md
+!dashboard/**/*.md

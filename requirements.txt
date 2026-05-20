@@ -1,0 +1,36 @@
+# ────────────────────────────────────────────────────────────────────
+# NYC Transit Predictor — Python Dependencies
+# Pinned for reproducible Docker builds.
+# ────────────────────────────────────────────────────────────────────
+
+# ── Core: Big Data & ML ─────────────────────────────────────────────
+pyspark==3.5.1
+py4j==0.10.9.7
+numpy==1.26.4
+pandas==2.2.2
+scikit-learn==1.5.1
+scipy==1.13.1
+pyarrow==16.1.0
+
+# ── Visualization ───────────────────────────────────────────────────
+matplotlib==3.9.1
+seaborn==0.13.2
+plotly==5.22.0
+
+# ── Streamlit Dashboard ─────────────────────────────────────────────
+streamlit==1.36.0
+altair==5.3.0
+pydeck==0.9.1
+
+# ── Utilities ───────────────────────────────────────────────────────
+python-dotenv==1.0.1
+requests==2.32.3
+pyyaml==6.0.1
+tqdm==4.66.4
+
+# ── Jupyter / EDA ───────────────────────────────────────────────────
+jupyter==1.0.0
+ipykernel==6.29.5
+
+# ── Production: Logging & Monitoring ────────────────────────────────
+loguru==0.7.2
