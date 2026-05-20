@@ -1,3 +1,9 @@
+My Role & Contributions
+I co-developed this project with my partner,Javeria Saqlain. While the original architecture lives in the main repository, my primary technical responsibilities on this codebase included:
+1.Data Engineering:Developed the Apache PySpark pipeline to process 2.1M transit rows and engineered the spatial coordinates.
+2.Machine Learning:Built the group-by-trip data split strategy and tuned the Random Forest Regressor using Spark MLlib.
+3.DevOps:Containerized the application stack with Docker Compose and set up the GitHub Actions CI pipeline.
+
 # NYC Transit Predictor
 
 End-to-end **Big Data + Machine Learning** pipeline that predicts the
